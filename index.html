@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadoras Financeiras</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .calculator-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .calculator-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15);
+        }
+        
+        .input-field {
+            border: 2px solid #dbeafe;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        }
+        
+        .result-display {
+            background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+            color: white;
+            border-radius: 16px;
+        }
+        
+        .discount-badge {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border-radius: 20px;
+        }
+        
+        .currency-input::-webkit-outer-spin-button,
+        .currency-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        .currency-input {
+            -moz-appearance: textfield;
+        }
+        
+        .nav-tab {
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .nav-tab.active {
+            border-bottom-color: #3b82f6;
+            color: #3b82f6;
+            font-weight: 600;
+        }
+        
+        .feature-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/1893f40a-50fa-46e0-95bc-619d69244131.png" alt="Logo de calculadora financeira com símbolo de gráfico e cifrão em azul" class="w-12 h-12 rounded-lg">
+                    <h1 class="text-2xl font-bold text-gray-800">Calculadoras Financeiras</h1>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex space-x-8 overflow-x-auto">
+                <button class="nav-tab py-4 px-2 active" onclick="showTab('valor-futuro')">
+                    Valor Futuro
+                </button>
+                <button class="nav-tab py-4 px-2" onclick="showTab('desconto')">
+                    Desconto
+                </button>
+                <button class="nav-tab py-4 px-2" onclick="showTab('sobre')">
+                    Sobre
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        <!-- Valor Futuro Calculator -->
+        <div id="tab-valor-futuro" class="tab-content active">
+            <div class="calculator-card p-6 md:p-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Calculadora de Valor Futuro</h2>
+                    <p class="text-gray-600">Simule seus investimentos com juros compostos</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Input Section -->
+                    <div class="space-y-6">
+                        <div class="space-y-4">
+                            <!-- Valor Inicial -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Valor Inicial (R$)</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
+                                    <input type="number" id="valorInicial" class="currency-input input-field w-full pl-10 pr-4 py-3 text-lg" placeholder="0,00" min="0" step="0.01" value="1000">
+                                </div>
+                            </div>
+
+                            <!-- Taxa de Juros -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Taxa de Juros Anual (%)</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
+                                    <input type="number" id="taxaJuros" class="currency-input input-field w-full pl-10 pr-4 py-3 text-lg" placeholder="0,00" min="0" step="0.01" value="12">
+                                </div>
+                            </div>
+
+                            <!-- Período -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Período (anos)</label>
+                                <input type="number" id="periodo" class="input-field w-full px-4 py-3 text-lg" placeholder="0" min="1" max="50" value="5">
+                            </div>
+
+                            <!-- Aporte Mensal -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Aporte Mensal (R$)</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
+                                    <input type="number" id="aporteMensal" class="currency-input input-field w-full pl-10 pr-4 py-3 text-lg" placeholder="0,00" min="0" step="0.01" value="100">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex space-x-4 pt-4">
+                            <button onclick="calcularValorFuturo()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
+                                Calcular
+                            </button>
+                            <button onclick="limparCamposVF()" class="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                                Limpar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Result Section -->
+                    <div class="result-display p-6 flex flex-col justify-center">
+                        <div class="text-center mb-6">
+                            <h3 class="text-2xl font-bold mb-2">Resultado</h3>
+                            <p class="opacity-90">Preencha os campos e clique em calcular</p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="text-center">
+                                <p class="text-sm opacity-80 mb-1">Valor Futuro</p>
+                                <div id="resultadoValor" class="text-3xl font-bold">R$ 0,00</div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4 text-center">
+                                <div>
+                                    <p class="text-sm opacity-80 mb-1">Total Investido</p>
+                                    <div id="totalInvestido" class="text-xl font-semibold">R$ 0,00</div>
+                                </div>
+                                <div>
+                                    <p class="text-sm opacity-80 mb-1">Rendimentos</p>
+                                    <div id="rendimentos" class="text-xl font-semibold">R$ 0,00</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Desconto Calculator -->
+        <div id="tab-desconto" class="tab-content">
+            <div class="calculator-card p-6 md:p-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Calculadora de Desconto</h2>
+                    <p class="text-gray-600">Calcule descontos com a fórmula DC = N . I . T</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Input Section -->
+                    <div class="space-y-6">
+                        <div class="space-y-4">
+                            <!-- Valor do Título -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Valor do Título (R$)</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
+                                    <input type="number" id="valorTitulo" class="currency-input input-field w-full pl-10 pr-4 py-4 text-lg" placeholder="0,00" min="0" step="0.01" value="1000">
+                                </div>
+                            </div>
+
+                            <!-- Taxa de Desconto -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Taxa de Desconto (%)</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
+                                    <input type="number" id="taxaDesconto" class="currency-input input-field w-full pl-10 pr-4 py-4 text-lg" placeholder="0,00" min="0" max="100" step="0.01" value="10">
+                                </div>
+                            </div>
+
+                            <!-- Tempo -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tempo (períodos)</label>
+                                <input type="number" id="tempo" class="input-field w-full px-4 py-4 text-lg" placeholder="0" min="1" value="1">
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex space-x-4 pt-4">
+                            <button onclick="calcularDesconto()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-4 px-8 rounded-xl transition-colors duration-200">
+                                Calcular Desconto
+                            </button>
+                            <button onclick="limparCamposDesc()" class="px-6 py-4 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors duration-200">
+                                Limpar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Result Section -->
+                    <div class="result-display p-6 flex flex-col justify-center">
+                        <div class="text-center mb-6">
+                            <h3 class="text-2xl font-bold mb-2">Resultado</h3>
+                            <p class="opacity-90">Preencha os campos para calcular</p>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <div class="text-center">
+                                <p class="text-sm opacity-80 mb-2">Valor do Título</p>
+                                <div id="resultadoTitulo" class="text-xl font-semibold">R$ 0,00</div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <p class="text-sm opacity-80 mb-2">Desconto (R$)</p>
+                                <div id="resultadoDesconto" class="text-3xl font-bold">R$ 0,00</div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <p class="text-sm opacity-80 mb-2">Valor Final (R$)</p>
+                                <div id="resultadoFinal" class="text-3xl font-bold">R$ 0,00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sobre Section -->
+        <div id="tab-sobre" class="tab-content">
+            <div class="calculator-card p-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Sobre as Calculadoras</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div class="feature-card bg-blue-50 p-6 rounded-xl cursor-pointer" onclick="showTab('valor-futuro')">
+                        <h3 class="text-xl font-semibold text-blue-800 mb-3">Calculadora de Valor Futuro</h3>
+                        <p class="text-blue-600">Calcula o valor futuro de investimentos considerando juros compostos e aportes mensais regulares.</p>
+                    </div>
+                    
+                    <div class="feature-card bg-red-50 p-6 rounded-xl cursor-pointer" onclick="showTab('desconto')">
+                        <h3 class="text-xl font-semibold text-red-800 mb-3">Calculadora de Desconto</h3>
+                        <p class="text-red-600">Calcula descontos simples usando a fórmula DC = N . I . T para títulos e valores.</p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Próximas Calculadoras</h3>
+                    <p class="text-gray-600 mb-4">Estamos trabalhando para adicionar mais calculadoras financeiras:</p>
+                    <ul class="list-disc list-inside text-gray-600 space-y-2">
+                        <li>Calculadora de Juros Compostos</li>
+                        <li>Calculadora de Amortização</li>
+                        <li>Calculadora de Rentabilidade</li>
+                        <li>Calculadora de Inflação</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Navigation Functions
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById('tab-' + tabName).classList.add('active');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Find and activate the corresponding nav tab
+            const activeTab = Array.from(document.querySelectorAll('.nav-tab')).find(tab => 
+                tab.textContent.trim().toLowerCase().includes(tabName.replace('-', ' '))
+            );
+            
+            if (activeTab) {
+                activeTab.classList.add('active');
+            }
+        }
+
+        // Valor Futuro Calculator Functions
+        function calcularValorFuturo() {
+            const valorInicial = parseFloat(document.getElementById('valorInicial').value) || 0;
+            const taxaJurosAnual = parseFloat(document.getElementById('taxaJuros').value) || 0;
+            const periodoAnos = parseInt(document.getElementById('periodo').value) || 0;
+            const aporteMensal = parseFloat(document.getElementById('aporteMensal').value) || 0;
+
+            const taxaMensal = Math.pow(1 + taxaJurosAnual / 100, 1/12) - 1;
+            const periodosMeses = periodoAnos * 12;
+
+            let valorFuturo = 0;
+            
+            if (taxaMensal === 0) {
+                valorFuturo = valorInicial + (aporteMensal * periodosMeses);
+            } else {
+                valorFuturo = valorInicial * Math.pow(1 + taxaMensal, periodosMeses) + 
+                             aporteMensal * ((Math.pow(1 + taxaMensal, periodosMeses) - 1) / taxaMensal);
+            }
+
+            const totalInvestido = valorInicial + (aporteMensal * periodosMeses);
+            const rendimentos = valorFuturo - totalInvestido;
+
+            document.getElementById('resultadoValor').textContent = `R$ ${valorFuturo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('totalInvestido').textContent = `R$ ${totalInvestido.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('rendimentos').textContent = `R$ ${rendimentos.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        }
+
+        function limparCamposVF() {
+            document.getElementById('valorInicial').value = '';
+            document.getElementById('taxaJuros').value = '';
+            document.getElementById('periodo').value = '';
+            document.getElementById('aporteMensal').value = '';
+            
+            document.getElementById('resultadoValor').textContent = 'R$ 0,00';
+            document.getElementById('totalInvestido').textContent = 'R$ 0,00';
+            document.getElementById('rendimentos').textContent = 'R$ 0,00';
+        }
+
+        // Desconto Calculator Functions
+        function calcularDesconto() {
+            const valorTitulo = parseFloat(document.getElementById('valorTitulo').value) || 0;
+            const taxaDesconto = parseFloat(document.getElementById('taxaDesconto').value) / 100 || 0;
+            const tempo = parseInt(document.getElementById('tempo').value) || 0;
+
+            const desconto = valorTitulo * taxaDesconto * tempo;
+            const valorFinal = valorTitulo - desconto;
+
+            document.getElementById('resultadoTitulo').textContent = `R$ ${valorTitulo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('resultadoDesconto').textContent = `R$ ${desconto.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('resultadoFinal').textContent = `R$ ${valorFinal.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        }
+
+        function limparCamposDesc() {
+            document.getElementById('valorTitulo').value = '';
+            document.getElementById('taxaDesconto').value = '';
+            document.getElementById('tempo').value = '';
+            
+            document.getElementById('resultadoTitulo').textContent = 'R$ 0,00';
+            document.getElementById('resultadoDesconto').textContent = 'R$ 0,00';
+            document.getElementById('resultadoFinal').textContent = 'R$ 0,00';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-calculate on input
+            const vfInputs = ['valorInicial', 'taxaJuros', 'periodo', 'aporteMensal'];
+            const descInputs = ['valorTitulo', 'taxaDesconto', 'tempo'];
+            
+            vfInputs.forEach(id => {
+                document.getElementById(id).addEventListener('input', calcularValorFuturo);
+            });
+            
+            descInputs.forEach(id => {
+                document.getElementById(id).addEventListener('input', calcularDesconto);
+            });
+            
+            // Initial calculations
+            calcularValorFuturo();
+            calcularDesconto();
+            
+            // Currency formatting
+            document.querySelectorAll('.currency-input').forEach(input => {
+                input.addEventListener('blur', function(e) {
+                    const value = parseFloat(e.target.value);
+                    if (!isNaN(value)) {
+                        e.target.value = value.toFixed(2);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
